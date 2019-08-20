@@ -1,78 +1,111 @@
-import { applyMiddleware, createStore } from "redux";
+import { applyMiddleware, createStore, combineReducers } from "redux";
 import thunk from "redux-thunk";
+import { loginState, LoginAction, loginReducer } from "./components/Login";
+import {
+  counterReducer,
+  counterState,
+  CounterAction
+} from "./components/Counter";
 
 export const initialState = {
-  count: 0,
-  login: {
-    loading: false,
-    email: "",
-    password: "",
-    token: ""
-  },
-  error: undefined as Error | undefined
+  counter: counterState,
+  login: loginState,
+  loading: false as string | boolean,
+  error: null as Error | null
 };
 
 export type State = typeof initialState;
 
-export type Action =
-  | { type: "Increment" }
-  | { type: "Decrement" }
-  | { type: "Change"; newValue: number }
-  | { type: "ChangeEmail"; email: string }
-  | { type: "ChangePassword"; password: string }
-  | { type: "LoginRequest" }
-  | { type: "LoginSuccess"; token: string }
-  | { type: "LoginFailed"; error: Error };
+export type LoadingAction =
+  | { type: "LoadingStart"; message: string | undefined }
+  | { type: "LoadingEnd" };
 
-const reducer: (state: State | undefined, action: Action) => State = (
-  state,
-  action
-) => {
-  state = state || initialState;
+export const loadingReducer: (
+  state: string | boolean | undefined,
+  action: LoadingAction
+) => string | boolean = (state, action) => {
+  state = state || false;
 
   switch (action.type) {
-    case "Increment":
-      return { ...state, count: state.count + 1 };
-    case "Decrement":
-      return { ...state, count: state.count - 1 };
-    case "Change":
-      return { ...state, count: action.newValue };
-    case "ChangeEmail":
-      return { ...state, login: { ...state.login, email: action.email } };
-    case "ChangePassword":
-      return { ...state, login: { ...state.login, password: action.password } };
-    case "LoginRequest":
-      return { ...state, login: { ...state.login, loading: true } };
-    case "LoginSuccess":
-      return {
-        ...state,
-        login: { ...state.login, loading: false, token: action.token }
-      };
-    case "LoginFailed":
-      return {
-        ...state,
-        login: { ...state.login, loading: false },
-        error: action.error
-      };
+    case "LoadingStart":
+      return action.message || true;
+    case "LoadingEnd":
+      return false;
+    default:
+      assertNever(action);
+      return state;
   }
 };
 
-export const store = createStore(reducer, applyMiddleware(thunk));
+export type ErrorAction =
+  | { type: "ErrorSet"; error: Error }
+  | { type: "ErrorRemove" };
+
+export const errorReducer: (
+  state: Error | null | undefined,
+  action: ErrorAction
+) => Error | null = (state, action) => {
+  state = state || null;
+
+  switch (action.type) {
+    case "ErrorSet":
+      return action.error;
+    case "ErrorRemove":
+      return null;
+    default:
+      assertNever(action);
+      return state;
+  }
+};
+
+export type Action = CounterAction | LoginAction | LoadingAction | ErrorAction;
+
+const reducer = combineReducers<State>({
+  counter: counterReducer,
+  login: loginReducer,
+  loading: loadingReducer,
+  error: errorReducer
+});
+
+export const store = createStore<State, Action, {}, {}>(
+  reducer,
+  initialState,
+  applyMiddleware(thunk)
+);
+
+export type DispatchConnect = {
+  dispatch: (action: Action) => void;
+};
 
 export function withLoadingAndErrorDispatcher(
   f: (...args: any[]) => Promise<any>,
-  ...args: any[]
+  ...args: any[] // or pass message here
 ) {
   return () => {
     store.dispatch({
-      type: "LoginRequest"
+      type: "LoadingStart",
+      message: undefined // or pass message here
     });
 
-    f(...args).catch(error =>
-      store.dispatch({
-        type: "LoginFailed",
-        error
+    f(...args)
+      .then(success => {
+        store.dispatch({
+          type: "LoadingEnd",
+          loading: false
+        });
+        return success;
       })
-    );
+      .catch((_error: Response) => {
+        store.dispatch({
+          type: "LoadingEnd",
+          loading: false
+        });
+        store.dispatch({
+          type: "ErrorSet",
+          error: new Error("custom eror here")
+        });
+      });
   };
 }
+
+export function assertNever(_: never) {}

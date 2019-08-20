@@ -2,22 +2,65 @@ import { connect } from "react-redux";
 import React, { FunctionComponent } from "react";
 import { Button, Text, TextInput, View } from "react-native";
 import {
-  Action,
-  initialState,
   State,
-  withLoadingAndErrorDispatcher
+  withLoadingAndErrorDispatcher,
+  initialState,
+  DispatchConnect,
+  assertNever
 } from "../store";
 import { accountApi } from "../api";
+import { AccountToken } from "../api/fetch";
 
-export const LoginP: FunctionComponent<{
-  email: string;
-  password: string;
-  token: string;
-  loading: boolean;
-  error?: any;
-  dispatch: (action: Action) => void;
-}> = ({ email, password, token, loading, error, dispatch }) => {
+export const loginState = {
+  email: "",
+  password: "",
+  token: ""
+};
+
+export type LoginState = typeof loginState;
+
+export type LoginAction =
+  | { type: "LoginChangeEmail"; email: string }
+  | { type: "LoginChangePassword"; password: string }
+  | { type: "LoginSuccess"; token: string }
+  | { type: "LoginFailed"; error: Error };
+
+export const loginReducer: (
+  state: LoginState | undefined,
+  action: LoginAction
+) => LoginState = (state, action) => {
+  state = state || loginState;
+
+  switch (action.type) {
+    case "LoginChangeEmail":
+      return { ...state, email: action.email };
+    case "LoginChangePassword":
+      return { ...state, password: action.password };
+    case "LoginSuccess":
+      return { ...state, loading: false, token: action.token };
+    case "LoginFailed":
+      return { ...state, loading: false, error: action.error };
+    default:
+      assertNever(action);
+      return state;
+  }
+};
+
+type LoginConnect = LoginState & {
+  loading: string | boolean;
+  error: Error | null;
+};
+
+export const LoginP: FunctionComponent<LoginConnect & DispatchConnect> = ({
+  email,
+  password,
+  token,
+  loading,
+  error,
+  dispatch
+}) => {
   const login = async () => {
+    console.log("logging in");
     const token = await accountApi.accountLogin({
       credentials: {
         email: email,
@@ -30,6 +73,8 @@ export const LoginP: FunctionComponent<{
     });
   };
 
+  console.log("loading", loading, "error", error);
+
   return (
     <View>
       <Text>Email</Text>
@@ -37,19 +82,21 @@ export const LoginP: FunctionComponent<{
         autoCapitalize={"none"}
         keyboardType={"email-address"}
         value={email}
-        onChangeText={text => dispatch({ type: "ChangeEmail", email: text })}
+        onChangeText={text =>
+          dispatch({ type: "LoginChangeEmail", email: text })
+        }
       />
       <Text>Password</Text>
       <TextInput
         secureTextEntry={true}
         value={password}
         onChangeText={text =>
-          dispatch({ type: "ChangePassword", password: text })
+          dispatch({ type: "LoginChangePassword", password: text })
         }
       />
       <Text>Loading: {(loading && "loading") || "no"}</Text>
       <Text>Token: {token}</Text>
-      <Text>Error: {(error && error.status) || "No error"}</Text>
+      <Text>Error: {(error && error.message) || "No error"}</Text>
       <Button onPress={withLoadingAndErrorDispatcher(login)} title="Login" />
     </View>
   );
@@ -57,11 +104,5 @@ export const LoginP: FunctionComponent<{
 
 export const Login = connect((state: State) => {
   state = state || initialState;
-  return {
-    email: state.login.email,
-    password: state.login.password,
-    token: state.login.token,
-    loading: state.login.loading,
-    error: state.error
-  };
+  return { ...state.login, loading: state.loading, error: state.error };
 })(LoginP);
