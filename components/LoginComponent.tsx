@@ -36,6 +36,7 @@ export const LoginComponent: FunctionComponent<
       type: "LoginSuccess",
       token: token.id
     });
+    dispatch({ type: "NavigateToEntreeSortieList" });
   };
 
   return (

@@ -8,13 +8,15 @@ import { Loading } from "./components/LoadingComponent";
 import { Dimensions } from "react-native";
 import { setTopLevelNavigator } from "./navigator";
 import { ErrorView } from "./components/ErrorComponent";
+import { EntreeSortieList } from "./components/EntreeSortieListComponent";
 
 const { width, height } = Dimensions.get("window");
 
 const RootStack = createStackNavigator(
   {
     Login: Login,
-    Counter: Counter
+    Counter: Counter,
+    EntreeSortieList: EntreeSortieList
   },
   {
     defaultNavigationOptions: ({ navigation }) => {

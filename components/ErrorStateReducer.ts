@@ -18,12 +18,12 @@ export const errorReducer: Reducer<ErrorState, ErrorAction> = (
 ) => {
   state = state || errorState;
 
-  // switch (action.type) {
-  //   case "Error":
-  return { ...state, error: action.error || null };
+  switch (action.type) {
+    case "Error":
+      return { ...state, error: action.error || null };
 
-  //   default:
-  //     assertNever(action);
-  //     return state;
-  // }
+    default:
+      // assertNever(action);
+      return state;
+  }
 };

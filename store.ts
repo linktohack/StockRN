@@ -23,10 +23,16 @@ import {
   errorReducer,
   errorState
 } from "./components/ErrorStateReducer";
+import {
+  EntreeSortieListAction,
+  entreeSortieListReducer,
+  entreeSortieState
+} from "./components/EntreeSortieListStateReducer";
 
 export const initialState = {
   counter: counterState,
   login: loginState,
+  entreeSorties: entreeSortieState,
   loading: loadingState,
   error: errorState
 };
@@ -35,12 +41,14 @@ export type State = typeof initialState;
 
 export type NavigationAction =
   | { type: "NavigateToCounter"; count: number }
-  | { type: "NavigateToLogin"; email: string; password?: string };
+  | { type: "NavigateToLogin"; email: string; password?: string }
+  | { type: "NavigateToEntreeSortieList" };
 
 export type Action =
   | CounterAction
   | LoginAction
   | LoadingAction
+  | EntreeSortieListAction
   | ErrorAction
   | NavigationAction;
 
@@ -48,6 +56,7 @@ const combinedReducers = combineReducers<any>({
   counter: counterReducer,
   login: loginReducer,
   loading: loadingReducer,
+  entreeSorties: entreeSortieListReducer,
   error: errorReducer
 });
 
@@ -79,6 +88,16 @@ export const reducer: Reducer<State, Action> = (state, action) => {
           password: action.password
         }
       };
+    case "NavigateToEntreeSortieList":
+      navigatorRef &&
+        navigatorRef.dispatch(
+          NavigationActions.navigate({
+            routeName: "EntreeSortieList"
+          })
+        );
+      return {
+        ...state
+      };
     default:
       assertNever(action);
       return combinedReducers(state, action);
@@ -108,7 +127,7 @@ export function withLoadingAndErrorDispatcher(
     });
 
     await new Promise(resolve => {
-      setTimeout(resolve, 1000);
+      setTimeout(resolve, 100);
     });
 
     f(...args)
