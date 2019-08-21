@@ -4,24 +4,19 @@ import { Provider } from "react-redux";
 import { store } from "./store";
 import { Counter } from "./components/Counter";
 import { Login } from "./components/Login";
+import { createStackNavigator, createAppContainer } from "react-navigation";
+
+const RootStack = createStackNavigator({
+  Login: Login,
+  Counter: Counter
+});
+
+const Navigation = createAppContainer(RootStack);
 
 export default function App() {
   return (
     <Provider store={store}>
-      <View style={styles.container}>
-        <Counter />
-        <Login />
-      </View>
+      <Navigation />
     </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
-    alignItems: "stretch",
-    justifyContent: "center"
-  }
-});

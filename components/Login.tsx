@@ -5,7 +5,7 @@ import {
   State,
   withLoadingAndErrorDispatcher,
   initialState,
-  DispatchConnect,
+  ConnectedProp,
   assertNever
 } from "../store";
 import { accountApi } from "../api";
@@ -51,13 +51,14 @@ type LoginConnect = LoginState & {
   error: Error | null;
 };
 
-export const LoginP: FunctionComponent<LoginConnect & DispatchConnect> = ({
+export const LoginP: FunctionComponent<LoginConnect & ConnectedProp> = ({
   email,
   password,
   token,
   loading,
   error,
-  dispatch
+  dispatch,
+  navigation
 }) => {
   const login = async () => {
     console.log("logging in");
@@ -73,7 +74,6 @@ export const LoginP: FunctionComponent<LoginConnect & DispatchConnect> = ({
     });
   };
 
-  console.log("loading", loading, "error", error);
 
   return (
     <View>
@@ -98,6 +98,7 @@ export const LoginP: FunctionComponent<LoginConnect & DispatchConnect> = ({
       <Text>Token: {token}</Text>
       <Text>Error: {(error && error.message) || "No error"}</Text>
       <Button onPress={withLoadingAndErrorDispatcher(login)} title="Login" />
+      <Button onPress={() => navigation.navigate("Counter")} title="Navigate to Counter" />
     </View>
   );
 };

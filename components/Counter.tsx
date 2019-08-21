@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import { Button, TextInput, View } from "react-native";
 import { connect } from "react-redux";
-import { assertNever, State, initialState, DispatchConnect } from "../store";
+import { assertNever, State, initialState, ConnectedProp } from "../store";
 
 export const counterState = {
   count: 0
@@ -33,7 +33,7 @@ export const counterReducer: (
   }
 };
 
-export const CounterP: FunctionComponent<CounterState & DispatchConnect> = ({
+export const CounterP: FunctionComponent<CounterState & ConnectedProp> = ({
   count,
   dispatch
 }) => {

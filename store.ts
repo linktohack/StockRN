@@ -6,6 +6,7 @@ import {
   counterState,
   CounterAction
 } from "./components/Counter";
+import { NavigationScreenProp } from "react-navigation";
 
 export const initialState = {
   counter: counterState,
@@ -37,9 +38,7 @@ export const loadingReducer: (
   }
 };
 
-export type ErrorAction =
-  | { type: "ErrorSet"; error: Error }
-  | { type: "ErrorRemove" };
+export type ErrorAction = { type: "Error"; error: Error };
 
 export const errorReducer: (
   state: Error | null | undefined,
@@ -48,12 +47,10 @@ export const errorReducer: (
   state = state || null;
 
   switch (action.type) {
-    case "ErrorSet":
+    case "Error":
       return action.error;
-    case "ErrorRemove":
-      return null;
     default:
-      assertNever(action);
+      // assertNever(action);
       return state;
   }
 };
@@ -73,8 +70,9 @@ export const store = createStore<State, Action, {}, {}>(
   applyMiddleware(thunk)
 );
 
-export type DispatchConnect = {
+export type ConnectedProp = {
   dispatch: (action: Action) => void;
+  navigation: NavigationScreenProp<{}, {}>;
 };
 
 export function withLoadingAndErrorDispatcher(
@@ -101,7 +99,7 @@ export function withLoadingAndErrorDispatcher(
           loading: false
         });
         store.dispatch({
-          type: "ErrorSet",
+          type: "Error",
           error: new Error("custom eror here")
         });
       });
