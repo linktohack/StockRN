@@ -2,6 +2,7 @@ import React, { FunctionComponent } from "react";
 import { Button, TextInput, View } from "react-native";
 import { connect } from "react-redux";
 import { assertNever, State, initialState, ConnectedProp } from "../store";
+import { Reducer } from "redux";
 
 export const counterState = {
   count: 0
@@ -14,10 +15,10 @@ export type CounterAction =
   | { type: "CounterDecrement" }
   | { type: "CounterChange"; newValue: number };
 
-export const counterReducer: (
-  state: CounterState | undefined,
-  action: CounterAction
-) => CounterState = (state, action) => {
+export const counterReducer: Reducer<CounterState, CounterAction> = (
+  state,
+  action
+) => {
   state = state || counterState;
 
   switch (action.type) {
@@ -60,11 +61,11 @@ export const CounterP: FunctionComponent<CounterState & ConnectedProp> = ({
         onPress={() =>
           dispatch({
             type: "NavigateToLogin",
-            email: "admin@hyrule.me",
+            email: "super@hyrule.me",
             password: "test"
           })
         }
-        title="Navigate to Counter via Redux"
+        title="Navigate to Login with information"
       />
     </View>
   );

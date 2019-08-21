@@ -10,6 +10,7 @@ import {
 } from "../store";
 import { accountApi } from "../api";
 import { AccountToken } from "../api/fetch";
+import { Reducer } from "redux";
 
 export const loginState = {
   email: "",
@@ -25,10 +26,10 @@ export type LoginAction =
   | { type: "LoginSuccess"; token: string }
   | { type: "LoginFailed"; error: Error };
 
-export const loginReducer: (
-  state: LoginState | undefined,
-  action: LoginAction
-) => LoginState = (state, action) => {
+export const loginReducer: Reducer<LoginState, LoginAction> = (
+  state,
+  action
+) => {
   state = state || loginState;
 
   switch (action.type) {
@@ -57,11 +58,9 @@ export const LoginP: FunctionComponent<LoginConnect & ConnectedProp> = ({
   token,
   loading,
   error,
-  dispatch,
-  navigation
+  dispatch
 }) => {
   const login = async () => {
-    console.log("logging in");
     const token = await accountApi.accountLogin({
       credentials: {
         email: email,
@@ -71,13 +70,6 @@ export const LoginP: FunctionComponent<LoginConnect & ConnectedProp> = ({
     dispatch({
       type: "LoginSuccess",
       token: token.id
-    });
-  };
-
-  const navigateToCounter = () => {
-    dispatch({ type: "CounterChange", newValue: 5 });
-    navigation.navigate("Counter", {
-      withMissingCount: 5
     });
   };
 
@@ -100,16 +92,16 @@ export const LoginP: FunctionComponent<LoginConnect & ConnectedProp> = ({
           dispatch({ type: "LoginChangePassword", password: text })
         }
       />
-      <Text>Loading: {(loading && "loading") || "no"}</Text>
+      <Text>Loading: {(loading === true && "yes") || loading || "no"}</Text>
       <Text>Token: {token}</Text>
       <Text>Error: {(error && error.message) || "No error"}</Text>
-      <Button onPress={withLoadingAndErrorDispatcher(login)} title="Login" />
-      <Button onPress={navigateToCounter} title="Navigate to Counter" />
       <Button
-        onPress={() =>
-          dispatch({ type: "NavigateToCounter",  count: 5 })
-        }
-        title="Navigate to Counter via Redux"
+        onPress={withLoadingAndErrorDispatcher(login, [], "Logging in...")}
+        title="Login"
+      />
+      <Button
+        onPress={() => dispatch({ type: "NavigateToCounter", count: 5 })}
+        title="Navigate to Counter"
       />
     </View>
   );

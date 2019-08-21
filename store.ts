@@ -1,4 +1,4 @@
-import { applyMiddleware, createStore, combineReducers } from "redux";
+import { applyMiddleware, createStore, combineReducers, Reducer } from "redux";
 import thunk from "redux-thunk";
 import { loginState, LoginAction, loginReducer } from "./components/Login";
 import {
@@ -40,11 +40,9 @@ const combinedReducers = combineReducers<any>({
   login: loginReducer
 });
 
-export const reducer: (
-  state: State | undefined,
-  action: RootAction
-) => State = (state, action) => {
+export const reducer: Reducer<State, Action> = (state, action) => {
   state = state || initialState;
+  action = action as RootAction;
 
   switch (action.type) {
     case "LoadingStart":
@@ -84,43 +82,48 @@ export const reducer: (
 };
 
 export const store = createStore<State, Action, {}, {}>(
-  reducer as any,
+  reducer,
   initialState,
   applyMiddleware(thunk)
 );
 
 export type ConnectedProp = {
   dispatch: (action: Action) => void;
-  navigation: NavigationScreenProp<{}, {}>;
+  // navigation: NavigationScreenProp<{}, {}>;
 };
 
 export function withLoadingAndErrorDispatcher(
   f: (...args: any[]) => Promise<any>,
-  ...args: any[] // or pass message here
+  args: any[] = [],
+  message?: string
 ) {
   return () => {
     store.dispatch({
       type: "LoadingStart",
-      message: undefined // or pass message here
+      message
     });
 
     f(...args)
       .then(success => {
         store.dispatch({
-          type: "LoadingEnd",
-          loading: false
+          type: "LoadingEnd"
         });
         return success;
       })
-      .catch((_error: Response) => {
+      .catch(async (error: Error | Response) => {
+        console.log("withLoadingAndErrorDispatcher:error", error);
+        if (!(error as Error).message) {
+          const text = await (error as Response).text();
+          error = new Error(text);
+        }
         store.dispatch({
-          type: "LoadingEnd",
-          loading: false
+          type: "LoadingEnd"
         });
         store.dispatch({
           type: "Error",
-          error: new Error("custom eror here")
+          error: error as Error
         });
+
       });
   };
 }
