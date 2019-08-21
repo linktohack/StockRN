@@ -2,64 +2,22 @@ import { connect } from "react-redux";
 import React, { FunctionComponent } from "react";
 import { Button, Text, TextInput, View } from "react-native";
 import {
-  State,
-  withLoadingAndErrorDispatcher,
-  initialState,
   ConnectedProp,
-  assertNever
+  initialState,
+  State,
+  withLoadingAndErrorDispatcher
 } from "../store";
 import { accountApi } from "../api";
-import { AccountToken } from "../api/fetch";
-import { Reducer } from "redux";
-
-export const loginState = {
-  email: "",
-  password: "",
-  token: ""
-};
-
-export type LoginState = typeof loginState;
-
-export type LoginAction =
-  | { type: "LoginChangeEmail"; email: string }
-  | { type: "LoginChangePassword"; password: string }
-  | { type: "LoginSuccess"; token: string }
-  | { type: "LoginFailed"; error: Error };
-
-export const loginReducer: Reducer<LoginState, LoginAction> = (
-  state,
-  action
-) => {
-  state = state || loginState;
-
-  switch (action.type) {
-    case "LoginChangeEmail":
-      return { ...state, email: action.email };
-    case "LoginChangePassword":
-      return { ...state, password: action.password };
-    case "LoginSuccess":
-      return { ...state, loading: false, token: action.token };
-    case "LoginFailed":
-      return { ...state, loading: false, error: action.error };
-    default:
-      assertNever(action);
-      return state;
-  }
-};
+import { LoginState } from "./LoginStateReducer";
 
 type LoginConnect = LoginState & {
   loading: string | boolean;
   error: Error | null;
 };
 
-export const LoginP: FunctionComponent<LoginConnect & ConnectedProp> = ({
-  email,
-  password,
-  token,
-  loading,
-  error,
-  dispatch
-}) => {
+export const LoginComponent: FunctionComponent<
+  LoginConnect & ConnectedProp
+> = ({ email, password, token, loading, error, dispatch }) => {
   const login = async () => {
     const token = await accountApi.accountLogin({
       credentials: {
@@ -110,4 +68,4 @@ export const LoginP: FunctionComponent<LoginConnect & ConnectedProp> = ({
 export const Login = connect((state: State) => {
   state = state || initialState;
   return { ...state.login, loading: state.loading, error: state.error };
-})(LoginP);
+})(LoginComponent);

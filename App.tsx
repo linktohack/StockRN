@@ -1,10 +1,9 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
 import { Provider } from "react-redux";
-import { store, setTopLevelNavigator } from "./store";
-import { Counter } from "./components/Counter";
-import { Login } from "./components/Login";
-import { createStackNavigator, createAppContainer } from "react-navigation";
+import { setTopLevelNavigator, store } from "./store";
+import { Counter } from "./components/CounterComponent";
+import { Login } from "./components/LoginComponent";
+import { createAppContainer, createStackNavigator } from "react-navigation";
 
 const RootStack = createStackNavigator({
   Login: Login,

@@ -1,18 +1,23 @@
-import { applyMiddleware, createStore, combineReducers, Reducer } from "redux";
+import { applyMiddleware, combineReducers, createStore, Reducer } from "redux";
 import thunk from "redux-thunk";
-import { loginState, LoginAction, loginReducer } from "./components/Login";
 import {
-  counterReducer,
-  counterState,
-  CounterAction
-} from "./components/Counter";
-import {
-  NavigationScreenProp,
-  NavigationContainerComponent,
-  NavigationActions
+  NavigationActions,
+  NavigationContainerComponent
 } from "react-navigation";
+import {
+  CounterAction,
+  counterReducer,
+  counterState
+} from "./components/CounterStateReducer";
+import {
+  LoginAction,
+  loginReducer,
+  loginState
+} from "./components/LoginStateReducer";
+import { assertNever } from "./utils";
 
 let navigatorRef: NavigationContainerComponent;
+
 export function setTopLevelNavigator(ref: NavigationContainerComponent) {
   navigatorRef = ref;
 }
@@ -27,7 +32,7 @@ export const initialState = {
 export type State = typeof initialState;
 
 export type RootAction =
-  | { type: "LoadingStart"; message: string | undefined }
+  | { type: "LoadingStart"; message?: string }
   | { type: "LoadingEnd" }
   | { type: "Error"; error: Error }
   | { type: "NavigateToCounter"; count: number }
@@ -123,9 +128,6 @@ export function withLoadingAndErrorDispatcher(
           type: "Error",
           error: error as Error
         });
-
       });
   };
 }
-
-export function assertNever(_: never) {}
