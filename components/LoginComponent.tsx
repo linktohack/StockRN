@@ -1,6 +1,6 @@
 import { connect } from "react-redux";
 import React, { FunctionComponent, useEffect } from "react";
-import { Button, Text, TextInput, View } from "react-native";
+import { Button, Card, Input, Text } from "react-native-elements";
 import {
   ConnectedProp,
   initialState,
@@ -9,15 +9,15 @@ import {
 } from "../store";
 import { accountApi } from "../api";
 import { LoginState } from "./LoginStateReducer";
+import { SafeAreaView, View } from "react-native";
 
 type LoginConnect = LoginState & {
-  loading: string | boolean;
   error: Error | null;
 };
 
 export const LoginComponent: FunctionComponent<
   LoginConnect & ConnectedProp
-> = ({ email, password, token, loading, error, dispatch, navigation }) => {
+> = ({ email, password, token, error, dispatch, navigation }) => {
   useEffect(() => {
     email &&
       navigation.setParams({
@@ -39,40 +39,45 @@ export const LoginComponent: FunctionComponent<
   };
 
   return (
-    <View>
-      <Text>Email</Text>
-      <TextInput
-        autoCapitalize={"none"}
-        keyboardType={"email-address"}
-        value={email}
-        onChangeText={text =>
-          dispatch({ type: "LoginChangeEmail", email: text })
-        }
-      />
-      <Text>Password</Text>
-      <TextInput
-        secureTextEntry={true}
-        value={password}
-        onChangeText={text =>
-          dispatch({ type: "LoginChangePassword", password: text })
-        }
-      />
-      <Text>Loading: {(loading === true && "yes") || loading || "no"}</Text>
-      <Text>Token: {token}</Text>
-      <Text>Error: {(error && error.message) || "No error"}</Text>
+    <SafeAreaView style={{ flex: 1 }}>
+      <Card>
+        <Input
+          autoCapitalize={"none"}
+          keyboardType={"email-address"}
+          value={email}
+          onChangeText={text =>
+            dispatch({ type: "LoginChangeEmail", email: text })
+          }
+          label={"Email"}
+        />
+        <View style={{ height: 20 }} />
+        <Input
+          label={"Password"}
+          secureTextEntry={true}
+          value={password}
+          onChangeText={text =>
+            dispatch({ type: "LoginChangePassword", password: text })
+          }
+        />
+        <View style={{ height: 20 }} />
+        <Button
+          onPress={withLoadingAndErrorDispatcher(login, [], "Logging in...")}
+          title="Login"
+        />
+      </Card>
+      <View style={{ height: 20 }} />
       <Button
-        onPress={withLoadingAndErrorDispatcher(login, [], "Logging in...")}
-        title="Login"
-      />
-      <Button
+        type={"outline"}
+        containerStyle={{ margin: 20 }}
         onPress={() => dispatch({ type: "NavigateToCounter", count: 5 })}
         title="Navigate to Counter"
       />
-    </View>
+      <View style={{ flex: 1 }} />
+      <Text>Token: {token}</Text>
+    </SafeAreaView>
   );
 };
 
 export const Login = connect((state: State) => {
-  state = state || initialState;
-  return { ...state.login, loading: state.loading, error: state.error };
+  return (state || initialState).login;
 })(LoginComponent);

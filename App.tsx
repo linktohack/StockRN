@@ -1,9 +1,15 @@
 import React from "react";
 import { Provider } from "react-redux";
-import { setTopLevelNavigator, store } from "./store";
+import { store } from "./store";
 import { Counter } from "./components/CounterComponent";
 import { Login } from "./components/LoginComponent";
 import { createAppContainer, createStackNavigator } from "react-navigation";
+import { Loading } from "./components/LoadingComponent";
+import { Dimensions } from "react-native";
+import { setTopLevelNavigator } from "./navigator";
+import { ErrorView } from "./components/ErrorComponent";
+
+const { width, height } = Dimensions.get("window");
 
 const RootStack = createStackNavigator(
   {
@@ -25,10 +31,13 @@ export default function App() {
   return (
     <Provider store={store}>
       <Navigation
+        style={{ width, height }}
         ref={navigatorRef => {
           setTopLevelNavigator(navigatorRef!);
         }}
       />
+      <Loading style={{ width, height }} />
+      <ErrorView style={{ width, height }} />
     </Provider>
   );
 }
