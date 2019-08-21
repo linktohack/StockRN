@@ -2,7 +2,8 @@ import { applyMiddleware, combineReducers, createStore, Reducer } from "redux";
 import thunk from "redux-thunk";
 import {
   NavigationActions,
-  NavigationContainerComponent
+  NavigationContainerComponent,
+  NavigationScreenProp
 } from "react-navigation";
 import {
   CounterAction,
@@ -92,9 +93,9 @@ export const store = createStore<State, Action, {}, {}>(
   applyMiddleware(thunk)
 );
 
-export type ConnectedProp = {
+export type ConnectedProp<P = {}> = {
   dispatch: (action: Action) => void;
-  // navigation: NavigationScreenProp<{}, {}>;
+  navigation: NavigationScreenProp<P, {}>;
 };
 
 export function withLoadingAndErrorDispatcher(

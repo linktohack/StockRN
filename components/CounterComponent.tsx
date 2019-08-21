@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useEffect } from "react";
 import { Button, TextInput, View } from "react-native";
 import { connect } from "react-redux";
 import { ConnectedProp, initialState, State } from "../store";
@@ -6,7 +6,13 @@ import { CounterState } from "./CounterStateReducer";
 
 export const CounterComponent: FunctionComponent<
   CounterState & ConnectedProp
-> = ({ count, dispatch }) => {
+> = ({ count, dispatch, navigation }) => {
+  useEffect(() => {
+    navigation.setParams({
+      title: `Counter: ${count}`
+    });
+  }, [count]);
+
   return (
     <View style={{ display: "flex" }}>
       <Button

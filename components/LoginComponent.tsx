@@ -1,5 +1,5 @@
 import { connect } from "react-redux";
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useEffect } from "react";
 import { Button, Text, TextInput, View } from "react-native";
 import {
   ConnectedProp,
@@ -17,7 +17,14 @@ type LoginConnect = LoginState & {
 
 export const LoginComponent: FunctionComponent<
   LoginConnect & ConnectedProp
-> = ({ email, password, token, loading, error, dispatch }) => {
+> = ({ email, password, token, loading, error, dispatch, navigation }) => {
+  useEffect(() => {
+    email &&
+      navigation.setParams({
+        title: `Login: ${email}`
+      });
+  }, [email]);
+
   const login = async () => {
     const token = await accountApi.accountLogin({
       credentials: {
