@@ -6,7 +6,16 @@ import {
   counterState,
   CounterAction
 } from "./components/Counter";
-import { NavigationScreenProp } from "react-navigation";
+import {
+  NavigationScreenProp,
+  NavigationContainerComponent,
+  NavigationActions
+} from "react-navigation";
+
+let navigatorRef: NavigationContainerComponent;
+export function setTopLevelNavigator(ref: NavigationContainerComponent) {
+  navigatorRef = ref;
+}
 
 export const initialState = {
   counter: counterState,
@@ -17,55 +26,65 @@ export const initialState = {
 
 export type State = typeof initialState;
 
-export type LoadingAction =
+export type RootAction =
   | { type: "LoadingStart"; message: string | undefined }
-  | { type: "LoadingEnd" };
+  | { type: "LoadingEnd" }
+  | { type: "Error"; error: Error }
+  | { type: "NavigateToCounter"; count: number }
+  | { type: "NavigateToLogin"; email: string; password?: string };
 
-export const loadingReducer: (
-  state: string | boolean | undefined,
-  action: LoadingAction
-) => string | boolean = (state, action) => {
-  state = state || false;
+export type Action = CounterAction | LoginAction | RootAction;
+
+const combinedReducers = combineReducers<any>({
+  counter: counterReducer,
+  login: loginReducer
+});
+
+export const reducer: (
+  state: State | undefined,
+  action: RootAction
+) => State = (state, action) => {
+  state = state || initialState;
 
   switch (action.type) {
     case "LoadingStart":
-      return action.message || true;
+      return { ...state, loading: action.message || true };
     case "LoadingEnd":
-      return false;
+      return { ...state, loading: false };
+    case "Error":
+      return { ...state, error: action.error || null };
+    case "NavigateToCounter":
+      navigatorRef.dispatch(
+        NavigationActions.navigate({
+          routeName: "Counter"
+        })
+      );
+      return { ...state, counter: { count: action.count } };
+    case "NavigateToLogin":
+      navigatorRef.dispatch(
+        NavigationActions.navigate({
+          routeName: "Login"
+        })
+      );
+      return {
+        ...state,
+        login: {
+          ...state.login,
+          email: action.email,
+          password: action.password
+        }
+      };
     default:
       assertNever(action);
-      return state;
+      return combinedReducers(
+        { counter: state.counter, login: state.login },
+        action
+      );
   }
 };
-
-export type ErrorAction = { type: "Error"; error: Error };
-
-export const errorReducer: (
-  state: Error | null | undefined,
-  action: ErrorAction
-) => Error | null = (state, action) => {
-  state = state || null;
-
-  switch (action.type) {
-    case "Error":
-      return action.error;
-    default:
-      // assertNever(action);
-      return state;
-  }
-};
-
-export type Action = CounterAction | LoginAction | LoadingAction | ErrorAction;
-
-const reducer = combineReducers<State>({
-  counter: counterReducer,
-  login: loginReducer,
-  loading: loadingReducer,
-  error: errorReducer
-});
 
 export const store = createStore<State, Action, {}, {}>(
-  reducer,
+  reducer as any,
   initialState,
   applyMiddleware(thunk)
 );

@@ -56,6 +56,16 @@ export const CounterP: FunctionComponent<CounterState & ConnectedProp> = ({
         onPress={() => dispatch({ type: "CounterDecrement" })}
         title="Decrement"
       />
+      <Button
+        onPress={() =>
+          dispatch({
+            type: "NavigateToLogin",
+            email: "admin@hyrule.me",
+            password: "test"
+          })
+        }
+        title="Navigate to Counter via Redux"
+      />
     </View>
   );
 };

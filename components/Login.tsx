@@ -74,6 +74,12 @@ export const LoginP: FunctionComponent<LoginConnect & ConnectedProp> = ({
     });
   };
 
+  const navigateToCounter = () => {
+    dispatch({ type: "CounterChange", newValue: 5 });
+    navigation.navigate("Counter", {
+      withMissingCount: 5
+    });
+  };
 
   return (
     <View>
@@ -98,7 +104,13 @@ export const LoginP: FunctionComponent<LoginConnect & ConnectedProp> = ({
       <Text>Token: {token}</Text>
       <Text>Error: {(error && error.message) || "No error"}</Text>
       <Button onPress={withLoadingAndErrorDispatcher(login)} title="Login" />
-      <Button onPress={() => navigation.navigate("Counter")} title="Navigate to Counter" />
+      <Button onPress={navigateToCounter} title="Navigate to Counter" />
+      <Button
+        onPress={() =>
+          dispatch({ type: "NavigateToCounter",  count: 5 })
+        }
+        title="Navigate to Counter via Redux"
+      />
     </View>
   );
 };
