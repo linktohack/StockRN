@@ -16,11 +16,9 @@ export type LoginAction =
   | { type: "LoginFailed"; error: Error };
 
 export const loginReducer: Reducer<LoginState, LoginAction> = (
-  state,
+  state = loginState,
   action
 ) => {
-  state = state || loginState;
-
   switch (action.type) {
     case "LoginChangeEmail":
       return { ...state, email: action.email };

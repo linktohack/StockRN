@@ -14,6 +14,6 @@ export const LoadingComponent: FunctionComponent<
   );
 };
 
-export const Loading = connect((state: State) => {
-  return (state: State) => (state || initialState).loading;
+export const Loading = connect((state: State = initialState) => {
+  return (state: State) => state.loading;
 })(LoadingComponent);

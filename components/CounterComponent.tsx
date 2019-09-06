@@ -82,6 +82,6 @@ export const CounterComponent: FunctionComponent<
   );
 };
 
-export const Counter = connect(
-  (state: State) => (state || initialState).counter
-)(CounterComponent);
+export const Counter = connect((state: State = initialState) => state.counter)(
+  CounterComponent
+);

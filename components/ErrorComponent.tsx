@@ -27,6 +27,6 @@ export const ErrorComponent: FunctionComponent<ErrorState & ConnectedProp> = ({
   );
 };
 
-export const ErrorView = connect((state: State) => {
-  return (state || initialState).error;
+export const ErrorView = connect((state: State = initialState) => {
+  return state.error;
 })(ErrorComponent);

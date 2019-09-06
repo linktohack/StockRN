@@ -126,11 +126,7 @@ export function withLoadingAndErrorDispatcher(
       message
     });
 
-    await new Promise(resolve => {
-      setTimeout(resolve, 100);
-    });
-
-    f(...args)
+    return f(...args)
       .then(success => {
         store.dispatch({
           type: "LoadingEnd"

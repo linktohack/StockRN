@@ -1,6 +1,5 @@
 import { EntreeSortie } from "../api/fetch/models";
 import { Reducer } from "redux";
-import { assertNever } from "../utils";
 
 export const entreeSortieState = {
   entreeSorties: [] as EntreeSortie[]
@@ -14,11 +13,9 @@ export type EntreeSortieListAction = {
 };
 
 export const entreeSortieListReducer: Reducer<
-  EntreeSortieListState | undefined,
+  EntreeSortieListState,
   EntreeSortieListAction
-> = (state: EntreeSortieListState, action: EntreeSortieListAction) => {
-  console.log("here", action);
-  state = state || entreeSortieState;
+> = (state = entreeSortieState, action) => {
   switch (action.type) {
     case "EntreeSortieListLoaded":
       return { ...state, entreeSorties: action.entreeSorties || [] };

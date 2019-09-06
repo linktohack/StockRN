@@ -15,11 +15,9 @@ export type LoadingAction =
   | { type: "LoadingEnd" };
 
 export const loadingReducer: Reducer<LoadingState, LoadingAction> = (
-  state,
+  state = loadingState,
   action
 ) => {
-  state = state || loadingState;
-
   switch (action.type) {
     case "LoadingStart":
       navigatorRef &&

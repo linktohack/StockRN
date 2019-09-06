@@ -79,6 +79,6 @@ export const LoginComponent: FunctionComponent<
   );
 };
 
-export const Login = connect((state: State) => {
-  return (state || initialState).login;
+export const Login = connect((state: State = initialState) => {
+  return state.login;
 })(LoginComponent);

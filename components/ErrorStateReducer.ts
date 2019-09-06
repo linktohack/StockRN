@@ -13,11 +13,9 @@ export type ErrorState = typeof errorState;
 export type ErrorAction = { type: "Error"; error?: Error };
 
 export const errorReducer: Reducer<ErrorState, ErrorAction> = (
-  state,
+  state = errorState,
   action
 ) => {
-  state = state || errorState;
-
   switch (action.type) {
     case "Error":
       return { ...state, error: action.error || null };

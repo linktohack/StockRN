@@ -13,11 +13,9 @@ export type CounterAction =
   | { type: "CounterChange"; newValue: number };
 
 export const counterReducer: Reducer<CounterState, CounterAction> = (
-  state,
+  state = counterState,
   action
 ) => {
-  state = state || counterState;
-
   switch (action.type) {
     case "CounterIncrement":
       return { ...state, count: state.count + 1 };
